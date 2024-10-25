@@ -1,6 +1,6 @@
 let circles = [];
 let arcs = [];
-let animationSpeed = 0.02;  // Speed of the size oscillation
+let animationSpeed = 0.02;  // Speed of the size change
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -53,7 +53,7 @@ function draw() {
   let centerY = height / 2;
   let mainCircleSize = min(width, height) * 0.5;  // Main circle size based on smaller screen dimension
   
-  let scaleFactor = sin(frameCount * animationSpeed) * 0.2 + 1;  // Sinusoidal animation factor for growth/shrink
+  let scaleFactor = sin(frameCount * animationSpeed) * 0.2 + 1;  // Sin animation factor for growth/shrink
   
   let verticalOffset = height * -.29;  // Dynamic offset based on canvas size
 
