@@ -1,4 +1,7 @@
 let circles = [];
+let arcs = [];
+let menuVisible = false; // Flag to show/hide menu
+let menuButtons = []; // Buttons for navigation
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -9,7 +12,6 @@ function setup() {
 
   // Define circles: [offsetX, offsetY, sizeFactor, r, g, b, alpha]
   circles = [
-    // [X, Y, size, r, g, b,     a]
     [-6, 5, 1.1, 213,235,222,200],   // White circle behind blue (center)
     [-6, 5, 1, 14,52,147,255],       // Blue circle (center)
     [-7, 4, .72, 20,20,20,255],      // Black circle (center)
@@ -44,6 +46,38 @@ function setup() {
   ];
 
   drawCircles();
+
+  // Create menu buttons for navigation
+  createMenuButtons();
+  escButton = createButton('ESC');
+  escButton.position(20, 20);
+  escButton.style('opacity', '0.5');
+  escButton.mousePressed(() => EscapeButton()); // Trigger menu on click 
+}
+function EscapeButton(){
+  showMenu();
+  escButton.hide();
+  menuVisible = true;
+  
+}
+function createMenuButtons() {
+  let staticButton = createButton('Static Mode');
+  staticButton.position(20, 60);
+  staticButton.mousePressed(() => window.location.href = 'index.html');
+  staticButton.hide();
+  menuButtons.push(staticButton);
+
+  let animatedButton = createButton('Animated Mode');
+  animatedButton.position(20, 90);
+  animatedButton.mousePressed(() => window.location.href = 'animated/animated.html');
+  animatedButton.hide();
+  menuButtons.push(animatedButton);
+
+  let interactiveButton = createButton('Interactive Mode');
+  interactiveButton.position(20, 120);
+  interactiveButton.mousePressed(() => window.location.href = 'animated2/animated.html');
+  interactiveButton.hide();
+  menuButtons.push(interactiveButton);
 }
 
 function drawCircles() {
@@ -51,8 +85,8 @@ function drawCircles() {
   
   let centerX = width / 2;
   let centerY = height / 2;
-  let mainCircleSize = min(width, height) * 0.5;  // Main circle size based on smaller screen dimension
-  let verticalOffset = height * -0.29;  // Apply the same dynamic vertical offset
+  let mainCircleSize = min(width, height) * 0.5;  
+  let verticalOffset = height * -0.29;  
 
   // Loop through each circle in the array and draw it
   circles.forEach(c => {
@@ -90,6 +124,32 @@ function drawCircles() {
       );
     }
   });
+
+  if (menuVisible) {
+    showMenu();
+  }
+}
+
+function showMenu() {
+  menuButtons.forEach(button => button.show());
+}
+
+function hideMenu() {
+  menuButtons.forEach(button => button.hide());
+}
+
+// Handle key presses for menu toggle
+function keyPressed() {
+  if (keyCode === ESCAPE) {
+    menuVisible = !menuVisible;
+    if (menuVisible) {
+      escButton.hide();
+      showMenu();
+    } else {
+      escButton.show();
+      hideMenu();
+    }
+  }
 }
 
 // Function to resize the canvas when the window is resized

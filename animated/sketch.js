@@ -3,9 +3,11 @@ let song;        // Variable to hold the song
 let amp;         // Amplitude analyzer
 let smoothedPulse = 1;  // Variable to store the smoothed pulse
 let noiseOffsets = [];   // Array to store Perlin noise offsets
+let menuVisible = false; // Flag to show/hide menu
+let menuButtons = [];    // Buttons for navigation
+let volumeSlider;        // Volume control slider
 
 function preload() {
-  // Load a song file (make sure you have a local file or a URL to use)
   song = loadSound('Where-Are-We-chosic.com_.mp3');
 }
 
@@ -13,12 +15,11 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   noStroke();
   
-  // Start analyzing amplitude (volume)
+  // Start analyzing volume
   amp = new p5.Amplitude();
   
   // Define circles: [offsetX, offsetY, sizeFactor, r, g, b, alpha]
   circles = [
-    // [X, Y, size, r, g, b,     a]
     [-6, 5, 1.1, 213,235,222,200],   // White circle behind blue (center)
     [-6, 5, 1, 14,52,147,255],       // Blue circle (center)
     [-7, 4, .72, 20,20,20,255],      // Black circle (center)
@@ -52,6 +53,46 @@ function setup() {
   noiseOffsets = circles.map(() => createVector(random(1000), random(1000)));
 
   song.loop();  // Play the song in a loop
+
+  // Create volume slider (hidden initially)
+  volumeSlider = createSlider(0, 1, 0.5, 0.01);
+  volumeSlider.position(20, 20);
+  volumeSlider.style('width', '150px');
+  volumeSlider.hide();  // Hide the slider initially
+
+  // Create menu buttons for navigation
+  createMenuButtons();
+
+  escButton = createButton('ESC');
+  escButton.position(20, 20);
+  escButton.style('opacity', '0.5');
+  escButton.mousePressed(() => EscapeButton()); // Trigger menu on click 
+}
+function EscapeButton(){
+  showMenu();
+  escButton.hide();
+  menuVisible = true;
+  
+}
+// define menu buttons
+function createMenuButtons() {
+  let staticButton = createButton('Static Mode');
+  staticButton.position(20, 60);
+  staticButton.mousePressed(() => window.location.href = '../index.html');
+  staticButton.hide();
+  menuButtons.push(staticButton);
+
+  let animatedButton = createButton('Animated Mode');
+  animatedButton.position(20, 90);
+  animatedButton.mousePressed(() => window.location.href = 'animated.html');
+  animatedButton.hide();
+  menuButtons.push(animatedButton);
+
+  let interactiveButton = createButton('Interactive Mode');
+  interactiveButton.position(20, 120);
+  interactiveButton.mousePressed(() => window.location.href = '../animated2/animated.html');
+  interactiveButton.hide();
+  menuButtons.push(interactiveButton);
 }
 
 function draw() {
@@ -62,13 +103,16 @@ function draw() {
   let mainCircleSize = min(width, height) * 0.5;  // Main circle size based on smaller screen dimension
   let verticalOffset = height * -0.29;  // Apply the same dynamic vertical offset
   
-  // Get the current amplitude (volume) level
+  // Get the current amplitude level
   let volume = amp.getLevel();
   
   // Smooth the pulse using lerp
-  let targetPulse = map(volume, 0, 1, 0.9, 1.2);  // Adjust these values for a smoother pulse
+  let targetPulse = map(volume, 0, 1, 0.9, 2.5);  // Adjust these values for a smoother pulse
   smoothedPulse = lerp(smoothedPulse, targetPulse, 0.05);  // Lerp for smoothing
   
+  // Set the song volume based on slider value
+  song.setVolume(volumeSlider.value());
+
   // Loop through each circle in the array and draw it
   circles.forEach((c, index) => {
     let [offsetX, offsetY, sizeFactor, r, g, b, alpha] = c;
@@ -93,6 +137,35 @@ function draw() {
       mainCircleSize * sizeFactor * smoothedPulse    // Apply the smoothed pulse effect
     );
   });
+
+  // Show menu if visible
+  if (menuVisible) {
+    showMenu();
+  }
+}
+
+function showMenu() {
+  volumeSlider.show();  // Show volume slider when the menu is visible
+  menuButtons.forEach(button => button.show());
+}
+
+function hideMenu() {
+  volumeSlider.hide();  // Hide volume slider when the menu is hidden
+  menuButtons.forEach(button => button.hide());
+}
+
+// Toggle the menu with Escape key
+function keyPressed() {
+  if (keyCode === ESCAPE) {
+    menuVisible = !menuVisible;
+    if (menuVisible) {
+      escButton.hide();
+      showMenu();
+    } else {
+      escButton.show();
+      hideMenu();
+    }
+  }
 }
 
 // Function to resize the canvas when the window is resized
